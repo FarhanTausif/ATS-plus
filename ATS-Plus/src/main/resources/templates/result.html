@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CV Scoring Result</title>
+</head>
+<body>
+<h1>CV Scoring Result</h1>
+<p><strong>Extracted CV Content:</strong> <pre th:text="${cvContent}"></pre></p>
+<p><strong>Extracted Job Requirements Content:</strong> <pre th:text="${jobContent}"></pre></p>
+<p><strong>Matching Score:</strong> <span th:text="${score}"></span></p>
+<a href="/">Score Another CV</a>
+</body>
+</html>

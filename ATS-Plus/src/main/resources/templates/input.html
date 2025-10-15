@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>CV Scoring System</title>
+</head>
+<body>
+<h1>Enter Applicant CV and Job Requirements PDF Links</h1>
+<form th:action="@{/score}" method="post">
+    <label for="cvLink">Applicant CV Google Drive Link (public shareable PDF):</label>
+    <input type="url" id="cvLink" name="cvLink" required/><br/><br/>
+    <label for="jobLink">Job Requirements Google Drive Link (public shareable PDF):</label>
+    <input type="url" id="jobLink" name="jobLink" required/><br/><br/>
+    <button type="submit">Score CV</button>
+</form>
+<p th:if="${error}" style="color:red;" th:text="${error}"></p>
+</body>
+</html>
