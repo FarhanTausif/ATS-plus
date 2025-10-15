@@ -2,16 +2,115 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>CV Scoring System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            flex: 1;
+        }
+        .gemini-btn {
+            background-color: #4285f4;
+            color: white;
+        }
+        .llama-btn {
+            background-color: #34a853;
+            color: white;
+        }
+        .llama-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .error {
+            background-color: #ffeaa7;
+            color: #d63031;
+            border: 1px solid #d63031;
+        }
+        .info {
+            background-color: #74b9ff;
+            color: white;
+        }
+        .success {
+            background-color: #00b894;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-<h1>Enter Applicant CV and Job Requirements PDF Links</h1>
-<form th:action="@{/score}" method="post">
-    <label for="cvLink">Applicant CV Google Drive Link (public shareable PDF):</label>
-    <input type="url" id="cvLink" name="cvLink" required/><br/><br/>
-    <label for="jobLink">Job Requirements Google Drive Link (public shareable PDF):</label>
-    <input type="url" id="jobLink" name="jobLink" required/><br/><br/>
-    <button type="submit">Score CV</button>
-</form>
-<p th:if="${error}" style="color:red;" th:text="${error}"></p>
+<h1>CV Scoring System</h1>
+<p>Compare applicant CVs with job requirements using AI-powered analysis</p>
+
+<div class="form-container">
+    <form id="cvForm">
+        <label for="cvLink">Applicant CV Google Drive Link (public shareable PDF):</label>
+        <input type="url" id="cvLink" name="cvLink" required placeholder="https://drive.google.com/file/d/..."/>
+
+        <label for="jobLink">Job Requirements Google Drive Link (public shareable PDF):</label>
+        <input type="url" id="jobLink" name="jobLink" required placeholder="https://drive.google.com/file/d/..."/>
+
+        <div class="button-container">
+            <button type="button" class="gemini-btn" onclick="submitForm('/score')">
+                📊 Score with Gemini AI
+            </button>
+            <button type="button" class="llama-btn"
+                    th:disabled="${!llamaAvailable}"
+                    onclick="submitForm('/score-local')"
+                    th:title="${llamaAvailable ? 'Use local Llama 3.2 3B model' : 'Local Llama model not available'}">
+                🦙 Score with Local Llama
+            </button>
+        </div>
+    </form>
+</div>
+
+<div th:if="${llamaAvailable}" class="status success">
+    ✅ Local Llama 3.2 3B model is available and ready to use
+</div>
+
+<div th:if="${!llamaAvailable}" class="status info">
+    ℹ️ Local Llama model not available. Make sure Ollama is running and llama3.2:3b model is installed.
+    <br/>To install: <code>ollama pull llama3.2:3b</code>
+</div>
+
+<div th:if="${error}" class="status error" th:text="${error}"></div>
+
+<script>
+function submitForm(action) {
+    const form = document.getElementById('cvForm');
+    form.action = action;
+    form.method = 'post';
+    form.submit();
+}
+</script>
 </body>
 </html>
