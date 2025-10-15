@@ -2,3 +2,5 @@ google-genai
 httpx
 python-dotenv
 pathlib
+PyPDF2
+requests
