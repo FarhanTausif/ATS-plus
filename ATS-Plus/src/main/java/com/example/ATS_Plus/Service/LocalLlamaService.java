@@ -38,7 +38,7 @@ public class LocalLlamaService {
                     "prompt": "%s",
                     "stream": false,
                     "options": {
-                        "temperature": 0.1,
+                        "temperature": 0,
                         "top_p": 0.9,
                         "max_tokens": 2000
                     }
