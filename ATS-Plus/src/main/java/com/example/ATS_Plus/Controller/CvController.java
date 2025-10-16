@@ -1,7 +1,5 @@
 package com.example.ATS_Plus.Controller;
 
-
-import com.example.ATS_Plus.DTO.ScoringResult;
 import com.example.ATS_Plus.Service.CVScoringService;
 import com.example.ATS_Plus.Service.LocalLlamaCVScoringService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.*;
 
 @Controller
 public class CvController {
@@ -41,12 +40,18 @@ public class CvController {
         }
 
         try {
+            long startSumm = System.currentTimeMillis();
             // Extract content from both PDFs using Gemini
             String cvContent = cvScoringService.extractCvContent(cvLink);
             String jobContent = cvScoringService.extractCvContent(jobLink);
+            long endSumm = System.currentTimeMillis();
+            System.out.println("Time taken for summarization with Gemini: " + (endSumm - startSumm) + " ms");
 
+            long startScore = System.currentTimeMillis();
             // Score using Gemini (compare both texts)
             String score = cvScoringService.scoreCv(cvContent, jobContent);
+            long endScore = System.currentTimeMillis();
+            System.out.println("Time taken for scoring with Gemini: " + (endScore - startScore) + " ms");
 
             model.addAttribute("cvContent", cvContent);
             model.addAttribute("jobContent", jobContent);
@@ -77,31 +82,29 @@ public class CvController {
                 model.addAttribute("llamaAvailable", false);
                 return "input";
             }
+            long startSumm = System.currentTimeMillis();
 
             // Extract content from both PDFs using local Llama
-//            String cvContent = localLlamaCVScoringService.extractCvContent(cvLink);
-//            String jobContent = localLlamaCVScoringService.extractCvContent(jobLink);
-//
-//            // Check for errors in content extraction
-//            if (cvContent.startsWith("Error:")) {
-//                model.addAttribute("error", cvContent);
-//                model.addAttribute("llamaAvailable", true);
-//                return "input";
-//            }
-//            if (jobContent.startsWith("Error:")) {
-//                model.addAttribute("error", jobContent);
-//                model.addAttribute("llamaAvailable", true);
-//                return "input";
-//            }
-
+            String cvContent = localLlamaCVScoringService.extractCvContent(cvLink);
+            String jobContent = localLlamaCVScoringService.extractCvContent(jobLink);
+            long endSumm = System.currentTimeMillis();
+            System.out.println("Time taken for summarization with local Llama: " + (endSumm - startSumm) + " ms");
+            // Check for errors in content extraction
+            if (cvContent.startsWith("Error:")) {
+                model.addAttribute("error", cvContent);
+                model.addAttribute("llamaAvailable", true);
+                return "input";
+            }
+            if (jobContent.startsWith("Error:")) {
+                model.addAttribute("error", jobContent);
+                model.addAttribute("llamaAvailable", true);
+                return "input";
+            }
+            long startScore = System.currentTimeMillis();
             // Score using local Llama (compare both texts)
-//            String score = localLlamaCVScoringService.scoreCv(cvContent, jobContent);
-            ScoringResult result = localLlamaCVScoringService.scoreCvllama(, jobRequirements);
-            model.addAttribute("summary", result.getSummary());
-            model.addAttribute("score", result.getScore());
-            model.addAttribute("pdfParseTimeMs", result.getPdfParseTimeMs());
-            model.addAttribute("summarizeTimeMs", result.getSummarizeTimeMs());
-            model.addAttribute("scoreTimeMs", result.getScoreTimeMs());
+            String score = localLlamaCVScoringService.scoreCv(cvContent, jobContent);
+            long endScore = System.currentTimeMillis();
+            System.out.println("Time taken for scoring with local Llama: " + (endScore - startScore) + " ms");
             model.addAttribute("cvContent", cvContent);
             model.addAttribute("jobContent", jobContent);
             model.addAttribute("score", score);
@@ -112,8 +115,5 @@ public class CvController {
             model.addAttribute("llamaAvailable", localLlamaCVScoringService.isLlamaModelAvailable());
             return "input";
         }
-
-        return "result";
-
     }
 }

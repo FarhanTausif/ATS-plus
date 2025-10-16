@@ -2,7 +2,6 @@ package com.example.ATS_Plus.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.ATS_Plus.DTO.ScoringResult;
 import com.example.ATS_Plus.Service.PdfTextExtractor;
 @Service
 public class LocalLlamaCVScoringService {
@@ -51,36 +50,6 @@ public class LocalLlamaCVScoringService {
 
     public boolean isLlamaModelAvailable() {
         return localLlamaService.isModelAvailable();
-    }
-    public ScoringResult scoreCvllama(String pdfPath, String jobRequirements) {
-        long startParse = System.currentTimeMillis();
-        try {
-            String cvContent = localLlamaPdfService.processPdfFromUrl(pdfPath);
-            String jobContent = localLlamaPdfService.processPdfFromUrl(jobRequirements);
-        }
-        catch (Exception e) {
-            ScoringResult errorResult = new ScoringResult();
-            errorResult.setSummary("Error processing the pdfs: " + e.getMessage());
-            return errorResult;
-        }
-
-        long endParse = System.currentTimeMillis();
-
-        long startSummarize = System.currentTimeMillis();
-        String summary = localLlamaService.summarizeText(cvText);
-        long endSummarize = System.currentTimeMillis();
-
-        long startScore = System.currentTimeMillis();
-        String score = localLlamaService.scoreCvAgainstJob(cvText, jobRequirements);
-        long endScore = System.currentTimeMillis();
-
-        ScoringResult result = new ScoringResult();
-        result.setSummary(summary);
-        result.setScore(score);
-        result.setPdfParseTimeMs(endParse - startParse);
-        result.setSummarizeTimeMs(endSummarize - startSummarize);
-        result.setScoreTimeMs(endScore - startScore);
-        return result;
     }
 
 }

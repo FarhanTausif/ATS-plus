@@ -38,7 +38,8 @@ public class LocalLlamaPdfService {
             return "Error: PDF appears to be empty or contains no readable text";
         }
 
-        return localLlamaService.summarizeText(pdfText);
+//        return localLlamaService.summarizeText(pdfText);
+        return pdfText;
     }
 
     private String extractTextFromPdf(byte[] pdfBytes) throws IOException {
