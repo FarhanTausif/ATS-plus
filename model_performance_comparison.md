@@ -11,11 +11,11 @@ This document compares the performance and output quality of two AI approaches f
 
 ### Timing Analysis
 
-| Metric | Gemini 2.5 Flash | DeepSeek-R1:8B (Ollama) | Winner |
-|--------|------------------|-------------------------|---------|
-| **Data Preparation** | 5-10s (PDF upload) | 0.2-0.5s (Local PDF reading) | 🏆 **Ollama** |
-| **Model Inference** | 45-50s | 400-600s | 🏆 **Gemini** |
-| **Total Time** | **55-60s** | **400-600s** | 🏆 **Gemini** |
+| Metric | Gemini 2.5 Flash | DeepSeek-R1:8B (Ollama) | Llama3.2:3b (Ollama) | Winner |
+|--------|------------------|-------------------------|----------------------|---------|
+| **Data Preparation** | 5-10s (PDF upload) | 0.2-0.5s (Local PDF reading) | 0.2-0.5s (Local PDF reading) | 🏆 **Ollama** |
+| **Model Inference** | 45-50s | 400-600s | 140-150s | 🏆 **Gemini** |
+| **Total Time** | **55-60s** | **400-600s** | **140-150s** | 🏆 **Gemini** |
 
 #### Detailed Timing Breakdown
 
@@ -28,6 +28,11 @@ This document compares the performance and output quality of two AI approaches f
 - PDF reading time: ~0.3 seconds
 - Model inference time: ~402 seconds
 - **Total execution time: ~402 seconds**
+
+**Llama3.2:3b (Ollama):**
+- PDF reading time: ~0.3 seconds
+- Model inference time: ~145 seconds
+- **Total execution time: ~145 seconds**
 
 ### Speed Comparison
 
@@ -68,14 +73,25 @@ the ATS prompt algorithm but didn't complete the full structured output
 in the required format within the timeout window.
 ```
 
+#### Llama3.2:3b (Ollama) Output:
+```
+SCORE: 75.00/100
+TECHNICAL: 15.00/40 (10/27)
+EXPERIENCE: 25/25
+EDUCATION: 20/20
+INDUSTRY: 15/15
+MATCHED: Java, Spring Boot, RESTful APIs, SQL databases, Git, Docker, Microservices, Containerization, API integration, Microservices architecture, LLM integration
+MISSING: Spring Data JPA, PostgreSQL, MySQL, Spring Security, Spring MVC, REST API design principles, Maven/Gradle, Unit testing (JUnit), Unit testing (Mockito), Cloud deployment (AWS/GCP/Azure), Message queues (RabbitMQ/Kafka), CI/CD pipelines, Kubernetes
+```
+
 ### Quality Assessment
 
-| Aspect | Gemini 2.5 Flash | DeepSeek-R1:8B (Ollama) | Winner |
-|--------|------------------|-------------------------|---------|
-| **Format Compliance** | ✅ Perfect format adherence | ❌ Incomplete/truncated | 🏆 **Gemini** |
-| **Accuracy** | ✅ Precise skill matching | ⚠️ Started well but incomplete | 🏆 **Gemini** |
-| **Completeness** | ✅ Full structured output | ❌ Partial response | 🏆 **Gemini** |
-| **Detail Level** | ✅ Comprehensive analysis | ⚠️ Verbose but incomplete | 🏆 **Gemini** |
+| Aspect | Gemini 2.5 Flash | DeepSeek-R1:8B (Ollama) | Llama3.2:3b (Ollama) | Winner |
+|--------|------------------|-------------------------|----------------------|---------|
+| **Format Compliance** | ✅ Perfect format adherence | ❌ Incomplete/truncated | ⚠️ Minor format issues | 🏆 **Gemini** |
+| **Accuracy** | ✅ Precise skill matching | ⚠️ Started well but incomplete | ✅ Good skill matching | 🏆 **Gemini** |
+| **Completeness** | ✅ Full structured output | ❌ Partial response | ✅ Mostly complete | 🏆 **Gemini** |
+| **Detail Level** | ✅ Comprehensive analysis | ⚠️ Verbose but incomplete | ✅ Concise and relevant | 🏆 **Gemini** |
 
 ## Resource Requirements
 
@@ -92,6 +108,16 @@ in the required format within the timeout window.
   - RAM: ~8-12GB for model loading
   - Storage: ~5.2GB model size
   - CPU/GPU: Significant compute for inference
+- **Internet:** Not required after model download
+- **Cost:** Hardware costs + electricity
+- **Scalability:** Limited by local hardware
+
+### Llama3.2:3b (Ollama)
+- **Infrastructure:** Local machine required
+- **Local Resources:** 
+  - RAM: ~4-8GB for model loading
+  - Storage: ~2-3GB model size
+  - CPU/GPU: Moderate compute for inference
 - **Internet:** Not required after model download
 - **Cost:** Hardware costs + electricity
 - **Scalability:** Limited by local hardware
@@ -132,6 +158,23 @@ in the required format within the timeout window.
 - ❌ **Potential timeout issues** with large contexts
 - ❌ **Hardware dependency**
 
+### Llama3.2:3b (Ollama)
+
+**Pros:**
+- ✅ Faster inference than DeepSeek-R1:8B
+- ✅ Complete data privacy (everything local)
+- ✅ No API costs after setup
+- ✅ Works offline
+- ✅ Full control over model parameters
+- ✅ No rate limiting
+
+**Cons:**
+- ❌ Slower than Gemini
+- ❌ Local resource requirements (but less than DeepSeek-R1:8B)
+- ❌ Minor output formatting issues
+- ❌ Manual model management
+- ❌ Hardware dependency
+
 ## Recommendations
 
 ### Use Gemini 2.5 Flash When:
@@ -148,11 +191,20 @@ in the required format within the timeout window.
 - ✅ You have sufficient local hardware
 - ✅ Processing time is not critical
 
+### Use Llama3.2:3b (Ollama) When:
+- ✅ Data privacy is important
+- ✅ Faster local inference is needed
+- ✅ Offline operation is required
+- ✅ You have sufficient local hardware
+- ✅ Output format can be post-processed
+
 ## Conclusion
 
 **For production ATS systems:** **Gemini 2.5 Flash** is the clear winner due to its superior speed, reliability, and consistent output formatting.
 
 **For privacy-sensitive or offline environments:** **DeepSeek-R1:8B (Ollama)** provides a viable alternative despite performance trade-offs.
+
+**For faster local evaluation with good output quality:** **Llama3.2:3b (Ollama)** is a strong choice, balancing speed and privacy, though it may require minor post-processing for perfect format compliance.
 
 The choice ultimately depends on your specific requirements for speed, privacy, cost, and infrastructure constraints.
 

@@ -20,7 +20,7 @@ def read_pdf(path):
 
 # Your ATS prompt
 ATS_PROMPT = os.getenv("ATS_PROMPT")
-print(f"ATS_PROMPT loaded: {'Yes' if ATS_PROMPT else 'No'}")
+print(f"ATS_PROMPT loaded: {'Yes' if ATS_PROMPT else 'No'}", "ATS_PROMPT:", ATS_PROMPT, "\n")
 
 # Read PDF files
 print("Reading PDF files...")
@@ -35,15 +35,15 @@ print(f"PDF reading time: {end_time - start_time} seconds")
 start_time = time.time()
 # Prepare Ollama request
 payload = {
-    "model": "deepseek-r1:8b",
+    "model": os.getenv("OLLAMA_MODEL"),
     "prompt": f"{ATS_PROMPT}\n\nJob Description:\n{job_text}\n\nResume:\n{resume_text}",
     "stream": False,
     # Model options
     "options": {
-        "num_predict": 300,
-        "temperature": 0.0,
-        "num_ctx": 4096,
-        "mirostat": 0,
+        "num_predict": 2000, # Adjust based on expected response length
+        "temperature": 0.0, # Lower temperature for more deterministic output
+        "num_ctx": 4096, # Context length, adjust based on model capabilities
+        "mirostat": 0, 
         "repeat_penalty": 1.1,
         "top_p": 0.9,
         "stop": ["SCORE:", "MISSING:"]
@@ -52,7 +52,7 @@ payload = {
 
 # Call local Ollama API
 ollama_url = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/generate")
-print(f"Calling Ollama at: {ollama_url}")
+print(f"Calling Ollama at: {ollama_url} with model {payload['model']}")
 print("Making API request... (this may take a while)")
 
 try:
