@@ -19,6 +19,6 @@ public class CvContent {
     private Long cvContentId;
     @Column(name="cvFileId", nullable = false)
     private Long cvFileId;
-    @Column(name="extractedText", nullable = false)
+    @Column(name="extractedText", nullable = false, length = 10000)
     private String extractedText;
 }

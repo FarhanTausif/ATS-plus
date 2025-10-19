@@ -30,7 +30,7 @@ public class FileController {
     @Autowired
     private LocalLlamaPdfService localLlamaPdfService;
     @Autowired
-    private CvContentService CvContentService;
+    private CvContentService cvContentService;
 
     @PostMapping("/cv")
     public ResponseEntity<?> uploadCv(@RequestParam("file") MultipartFile file,
@@ -49,9 +49,12 @@ public class FileController {
                     .uploadDate(LocalDateTime.now())
                     .build();
             CvFile savedCvFile = cvFileService.saveCvFile(cvFile);
-            String cvExtractedText = localLlamaPdfService.processPdfFromUrl(cvFile.getCloudinaryUrl());
-            CvContent cvContent = CvContent.builder().cvContentId(cvFile.getCvFileId()).extractedText(cvExtractedText).build();
-            CvContentService.saveCvContent(cvContent);
+            String cvExtractedText = localLlamaPdfService.processPdfFromUrl(savedCvFile.getCloudinaryUrl());
+            CvContent cvContent = CvContent.builder()
+                    .cvFileId(savedCvFile.getCvFileId())
+                    .extractedText(cvExtractedText)
+                    .build();
+            cvContentService.saveCvContent(cvContent);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "CV uploaded successfully");
