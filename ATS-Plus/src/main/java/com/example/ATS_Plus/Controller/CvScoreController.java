@@ -1,8 +1,8 @@
 package com.example.ATS_Plus.Controller;
 
-
 import com.example.ATS_Plus.Model.CvFile;
 import com.example.ATS_Plus.Model.JobRequirement;
+import com.example.ATS_Plus.Service.CvContentService;
 import com.example.ATS_Plus.Service.CvFileService;
 import com.example.ATS_Plus.Service.JobRequirementService;
 import com.example.ATS_Plus.Service.LocalLlamaCVScoringService;
@@ -23,6 +23,8 @@ public class CvScoreController {
 
     @Autowired
     private CvFileService cvFileService;
+    @Autowired
+    private CvContentService cvContentService;
 
     @Autowired
     private JobRequirementService jobRequirementService;
@@ -42,7 +44,6 @@ public class CvScoreController {
             Long cvFileId = Long.parseLong(cvFileIdStr);
             Long jobRequirementId = Long.parseLong(jobRequirementIdStr);
 
-            // Get uploaded files from database
             CvFile cvFile = cvFileService.getCvFileById(cvFileId);
             JobRequirement jobRequirement = jobRequirementService.getJobRequirementById(jobRequirementId);
 
@@ -65,13 +66,11 @@ public class CvScoreController {
             }
 
             long startExtract = System.currentTimeMillis();
-            // Use Cloudinary URLs to extract content
-            String cvContent = localLlamaCVScoringService.extractCvContent(cvFile.getCloudinaryUrl());
-            String jobContent = jobRequirement.getDescription(); // Use description directly for job requirements
+            String cvContent = cvContentService.getCvContentByCvFileId(cvFile.getCvFileId()).getExtractedText();
+            String jobContent = jobRequirement.getDescription();
             long endExtract = System.currentTimeMillis();
             long extractTime = endExtract - startExtract;
 
-            // Check for extraction errors
             if (cvContent.startsWith("Error:")) {
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("error", cvContent);

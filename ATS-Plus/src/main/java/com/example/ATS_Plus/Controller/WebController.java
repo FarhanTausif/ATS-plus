@@ -18,7 +18,6 @@ public class WebController {
 
     @GetMapping("/")
     public String showInputForm(Model model) {
-        // Check if local Llama model is available
         boolean llamaAvailable = localLlamaCVScoringService.isLlamaModelAvailable();
         model.addAttribute("llamaAvailable", llamaAvailable);
         return "input";

@@ -82,29 +82,19 @@ class FileUploadApp {
         const formData = new FormData();
         const fileInput = document.getElementById('jobFile');
         const jobTitleInput = document.getElementById('jobTitle');
-        const jobDescriptionInput = document.getElementById('jobDescription');
+
+        if (!fileInput.files[0]) {
+            this.showStatus('jobUploadStatus', 'Please select a PDF file', 'error');
+            return;
+        }
 
         if (!jobTitleInput.value.trim()) {
             this.showStatus('jobUploadStatus', 'Please enter job title', 'error');
             return;
         }
 
-        if (!jobDescriptionInput.value.trim()) {
-            this.showStatus('jobUploadStatus', 'Please enter job description', 'error');
-            return;
-        }
-
-        // File is optional for job requirements
-        if (fileInput.files[0]) {
-            formData.append('file', fileInput.files[0]);
-        } else {
-            // Create a dummy file if no PDF is provided
-            const dummyFile = new File([''], 'dummy.pdf', { type: 'application/pdf' });
-            formData.append('file', dummyFile);
-        }
-
+        formData.append('file', fileInput.files[0]);
         formData.append('jobTitle', jobTitleInput.value.trim());
-        formData.append('description', jobDescriptionInput.value.trim());
         formData.append('userId', '1'); // Default user ID, you can modify this
 
         this.setUploadButtonState('jobUploadBtn', true, '⏳ Uploading...');
@@ -118,7 +108,7 @@ class FileUploadApp {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                this.showStatus('jobUploadStatus', '✅ Job requirement uploaded successfully!', 'success');
+                this.showStatus('jobUploadStatus', '✅ Job requirement uploaded and processed successfully!', 'success');
                 document.getElementById('jobUploadForm').reset();
                 this.loadJobList(); // Refresh job list
             } else {
@@ -327,5 +317,3 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new FileUploadApp();
 });
-
-
