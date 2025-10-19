@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <title>CV Scoring Result</title>
     <style>
@@ -22,19 +22,22 @@
             border-left: 5px solid #28a745;
             margin: 20px 0;
         }
+        .info-section {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #2196f3;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
         .method-badge {
             display: inline-block;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .gemini-badge {
-            background-color: #4285f4;
-            color: white;
-        }
-        .llama-badge {
+            margin-bottom: 15px;
             background-color: #34a853;
             color: white;
         }
@@ -45,6 +48,22 @@
             margin: 15px 0;
             border: 1px solid #ddd;
         }
+        .timing-section {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #87ceeb;
+        }
+        .timing-section h3 {
+            color: #1e90ff;
+            margin-top: 0;
+        }
+        .timing-section p {
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -53,54 +72,109 @@
             line-height: 1.4;
             max-height: 300px;
             overflow-y: auto;
+            margin: 0;
         }
         .back-button {
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             text-decoration: none;
             border-radius: 4px;
             display: inline-block;
             margin-top: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
         .back-button:hover {
             background-color: #0056b3;
             text-decoration: none;
             color: white;
         }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #34a853;
+            padding-bottom: 10px;
+        }
         h2 {
             color: #333;
             border-bottom: 2px solid #ddd;
             padding-bottom: 5px;
+        }
+        .score-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+            padding: 10px;
+        }
+        .loading-state {
+            text-align: center;
+            padding: 50px;
+        }
+        .error-state {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+        }
+        .candidate-job-info {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
         }
     </style>
 </head>
 <body>
 <h1>CV Scoring Result</h1>
 
-<div class="result-container">
-    <span th:class="${processingMethod == 'Gemini AI' ? 'method-badge gemini-badge' : 'method-badge llama-badge'}"
-          th:text="'Processed using: ' + ${processingMethod}"></span>
-
-    <div class="score-section">
-        <h2>📊 Matching Score</h2>
-        <div style="font-size: 24px; font-weight: bold; color: #28a745;" th:text="${score}"></div>
-    </div>
-
-    <div class="content-section">
-        <h2>📄 Extracted CV Content</h2>
-        <pre th:text="${cvContent}"></pre>
-    </div>
-
-    <div class="content-section">
-        <h2>💼 Extracted Job Requirements Content</h2>
-        <pre th:text="${jobContent}"></pre>
-    </div>
-<!--    <p>PDF Parse Time: <span th:text="${pdfParseTimeMs}"></span> ms</p>-->
-<!--    <p>Summarization Time: <span th:text="${summarizeTimeMs}"></span> ms</p>-->
-<!--    <p>Scoring Time: <span th:text="${scoreTimeMs}"></span> ms</p>-->
+<div id="loadingState" class="loading-state">
+    <p>⏳ Loading results...</p>
 </div>
 
-<a href="/" class="back-button">🔄 Score Another CV</a>
+<div id="errorState" class="error-state" style="display: none;">
+    <h3>❌ Error Loading Results</h3>
+    <p>No results found. Please go back and submit your CVs for scoring.</p>
+    <button class="back-button" id="backButton">🔄 Go Back</button>
+</div>
+
+<div id="resultsContent" style="display: none;">
+    <div class="result-container">
+        <div id="methodBadge" class="method-badge">
+            Processed using: Local Llama 3.2 3B
+        </div>
+
+        <div class="info-section">
+            <div class="candidate-job-info">
+                <div id="candidateInfo">Candidate: Loading...</div>
+            </div>
+            <div class="candidate-job-info">
+                <div id="jobInfo">Position: Loading...</div>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <h2>📊 Matching Score</h2>
+            <div id="score" class="score-display">Loading...</div>
+        </div>
+
+        <div id="timingInfo"></div>
+
+        <div class="content-section">
+            <h2>📄 Extracted CV Content</h2>
+            <pre id="cvContent">Loading...</pre>
+        </div>
+
+        <div class="content-section">
+            <h2>💼 Job Requirements Content</h2>
+            <pre id="jobContent">Loading...</pre>
+        </div>
+    </div>
+
+    <button class="back-button" id="backButton">🔄 Score Another CV</button>
+</div>
+
+<script src="/js/cvScoring.js"></script>
 </body>
 </html>

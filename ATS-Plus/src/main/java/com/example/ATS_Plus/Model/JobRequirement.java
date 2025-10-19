@@ -1,4 +1,5 @@
 package com.example.ATS_Plus.Model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class JobRequirement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +31,8 @@ public class JobRequirement {
             nullable = false
     )
     private LocalDateTime createdAt;
-    // Many-to-One relationship with User (HR)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
+    @JsonIgnoreProperties({"jobRequirements", "hibernateLazyInitializer", "handler"})
     private User user;
-    // One-to-Many relationship with CvScore
-//    @OneToMany(mappedBy = "jobRequirement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<CvScore> cvScores;
 }

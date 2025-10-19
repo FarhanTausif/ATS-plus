@@ -8,7 +8,7 @@ public class LocalLlamaCVScoringService {
 
     private final LocalLlamaService localLlamaService;
     private final LocalLlamaPdfService localLlamaPdfService;
-    private final PdfTextExtractor pdfTextExtractor = new PdfTextExtractor();
+//    private final PdfTextExtractor pdfTextExtractor = new PdfTextExtractor();
 
     @Autowired
     public LocalLlamaCVScoringService(LocalLlamaService localLlamaService, LocalLlamaPdfService localLlamaPdfService) {
@@ -49,6 +49,7 @@ public class LocalLlamaCVScoringService {
     }
 
     public boolean isLlamaModelAvailable() {
+        System.out.println("Checking if local Llama model is available..."+localLlamaService.isModelAvailable());
         return localLlamaService.isModelAvailable();
     }
 

@@ -27,13 +27,6 @@ public class CvScore {
 
     @Column(name="skillLacking", length = 2000)
     private String skillLacking;
-
-    // One-to-One relationship with CvFile
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "cvFileId", nullable = false)
-//    private CvFile cvFile;
-
-    // Many-to-One relationship with JobRequirement
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jobRequirementId", nullable = false)
     private JobRequirement jobRequirement;

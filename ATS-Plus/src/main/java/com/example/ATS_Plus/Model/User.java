@@ -1,26 +1,26 @@
 package com.example.ATS_Plus.Model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
-@Table(name = "user")
+@Table(name = "atsusers") // Changed to "atsusers" to match data.sql and avoid PostgreSQL reserved keyword
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    @Column(name = "userId")
+    @Column(name = "user_id")
     private Long userId;
-    @Column(name = "userName", nullable = false)
+    @Column(name = "user_name", nullable = false)
     private String userName;
-    @Column(name ="fullName", nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
     @Column(name="email", nullable = false, unique = true)
     private String email;
@@ -34,9 +34,6 @@ public class User {
     private String activationToken;
     @Column(name = "reset_token")
     private String resetToken;
-    // One-to-Many relationship with JobRequirement (for HR users)
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<JobRequirement> jobRequirements;
     public enum Roles{
         HR
     }

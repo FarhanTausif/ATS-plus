@@ -27,12 +27,4 @@ public class CvFile {
 
     @Column(name = "uploadDate",columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private LocalDateTime uploadDate;
-
-    // One-to-One relationship with CvContent
-//    @OneToOne(mappedBy = "cvFile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private CvContent cvContent;
-//
-//    // One-to-One relationship with CvScore
-//    @OneToOne(mappedBy = "cvFile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private CvScore cvScore;
 }

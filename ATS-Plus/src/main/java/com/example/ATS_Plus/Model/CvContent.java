@@ -21,9 +21,4 @@ public class CvContent {
     private Long cvFileId;
     @Column(name="extractedText", nullable = false)
     private String extractedText;
-
-    // One-to-One relationship with CvFile
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "cvFileId", nullable = false)
-//    private CvFile cvFile;
 }
