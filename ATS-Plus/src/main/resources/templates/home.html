@@ -11,7 +11,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container main-container">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-users-cog me-2"></i>ATS Plus
+            </a>
+            <div class="ms-auto">
+                <a href="/auth/login" class="btn btn-outline-light me-2">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+                <a href="/auth/register" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-1"></i>Sign Up
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container" style="margin-top: 80px;">
         <!-- Page Header -->
         <div class="page-header">
             <h1>Welcome to ATS Plus</h1>
@@ -40,8 +57,8 @@
                             <i class="fas fa-users-cog user-icon"></i>
                             <h3>I'm an HR Professional</h3>
                             <p>Managing recruitment and want to post jobs or review applications</p>
-                            <a href="/hr/dashboard" class="btn btn-success btn-lg">
-                                <i class="fas fa-tachometer-alt me-2"></i>HR Dashboard
+                            <a href="/auth/login" class="btn btn-success btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to HR Dashboard
                             </a>
                         </div>
                     </div>
