@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HR Dashboard - ATS Plus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .dashboard-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .activity-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 bg-dark text-white p-0">
+                <div class="sidebar-header p-3">
+                    <h4><i class="fas fa-users-cog me-2"></i>HR Panel</h4>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white active" href="/hr/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link text-white" href="/hr/job-management">
+                        <i class="fas fa-briefcase me-2"></i>Job Management
+                    </a>
+                    <a class="nav-link text-white" href="/hr/candidate-pool">
+                        <i class="fas fa-users me-2"></i>Candidate Pool
+                    </a>
+                    <a class="nav-link text-white" href="/hr/cv-scoring">
+                        <i class="fas fa-chart-line me-2"></i>CV Scoring
+                    </a>
+                    <a class="nav-link text-white" href="/hr/interviews">
+                        <i class="fas fa-calendar-alt me-2"></i>Interviews
+                    </a>
+                    <a class="nav-link text-white" href="/hr/reports">
+                        <i class="fas fa-file-alt me-2"></i>Reports
+                    </a>
+                    <hr class="text-white">
+                    <a class="nav-link text-white" href="/">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="container-fluid p-4">
+                    <!-- Page Header -->
+                    <div class="page-header mb-4">
+                        <h1>HR Dashboard</h1>
+                        <p class="page-subtitle">Manage your recruitment process efficiently</p>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stats-card text-center">
+                                <div class="stats-number" th:text="${totalJobs ?: 0}">0</div>
+                                <div>Active Jobs</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card text-center">
+                                <div class="stats-number" th:text="${totalApplications ?: 0}">0</div>
+                                <div>Applications</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card text-center">
+                                <div class="stats-number" th:text="${pendingInterviews ?: 0}">0</div>
+                                <div>Pending Interviews</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card text-center">
+                                <div class="stats-number" th:text="${newCandidates ?: 0}">0</div>
+                                <div>New Candidates</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <a href="/hr/job-management" class="dashboard-card d-block">
+                                <div class="text-center">
+                                    <i class="fas fa-plus-circle dashboard-icon text-primary"></i>
+                                    <h4>Post New Job</h4>
+                                    <p class="text-muted">Create and publish new job openings</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <a href="/hr/candidate-pool" class="dashboard-card d-block">
+                                <div class="text-center">
+                                    <i class="fas fa-users dashboard-icon text-success"></i>
+                                    <h4>View Candidates</h4>
+                                    <p class="text-muted">Browse and manage candidate applications</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <a href="/hr/cv-scoring" class="dashboard-card d-block">
+                                <div class="text-center">
+                                    <i class="fas fa-robot dashboard-icon text-info"></i>
+                                    <h4>AI CV Scoring</h4>
+                                    <p class="text-muted">Use AI to evaluate candidate CVs</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <a href="/hr/interviews" class="dashboard-card d-block">
+                                <div class="text-center">
+                                    <i class="fas fa-calendar-check dashboard-icon text-warning"></i>
+                                    <h4>Schedule Interviews</h4>
+                                    <p class="text-muted">Manage interview schedules and bookings</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <a href="/hr/reports" class="dashboard-card d-block">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-bar dashboard-icon text-danger"></i>
+                                    <h4>Analytics & Reports</h4>
+                                    <p class="text-muted">View recruitment metrics and insights</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="dashboard-card">
+                                <div class="text-center">
+                                    <i class="fas fa-cog dashboard-icon text-secondary"></i>
+                                    <h4>Settings</h4>
+                                    <p class="text-muted">Configure system preferences</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h4 class="mb-3"><i class="fas fa-clock me-2"></i>Recent Activity</h4>
+                        <div th:if="${recentActivities != null and !#lists.isEmpty(recentActivities)}">
+                            <div th:each="activity : ${recentActivities}" class="activity-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong th:text="${activity.title}">Activity Title</strong>
+                                        <div class="text-muted small" th:text="${activity.description}">Activity description
+                                        </div>
+                                    </div>
+                                    <small class="text-muted" th:text="${activity.timestamp}">2 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${recentActivities != null and !#lists.isEmpty(recentActivities)}">
+                            <div class="activity-item text-center text-muted">
+                                <i class="fas fa-info-circle me-2"></i>No recent activity to display
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

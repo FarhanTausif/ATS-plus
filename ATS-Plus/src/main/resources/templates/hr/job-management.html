@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Management - ATS Plus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background-color: #343a40;
+            min-height: 100vh;
+        }
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        .upload-area:hover {
+            border-color: #0d6efd;
+            background-color: #e7f3ff;
+        }
+        .upload-area.dragover {
+            border-color: #0d6efd;
+            background-color: #e7f3ff;
+        }
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .job-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .success-message {
+            display: none;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar text-white p-0">
+                <div class="sidebar-header p-3">
+                    <h4><i class="fas fa-users-cog me-2"></i>HR Panel</h4>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="/hr/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a class="nav-link text-white active" href="/hr/job-management">
+                        <i class="fas fa-briefcase me-2"></i>Job Management
+                    </a>
+                    <a class="nav-link text-white" href="/hr/candidate-pool">
+                        <i class="fas fa-users me-2"></i>Candidate Pool
+                    </a>
+                    <a class="nav-link text-white" href="/hr/cv-scoring">
+                        <i class="fas fa-chart-line me-2"></i>CV Scoring
+                    </a>
+                    <a class="nav-link text-white" href="/hr/interviews">
+                        <i class="fas fa-calendar-alt me-2"></i>Interviews
+                    </a>
+                    <a class="nav-link text-white" href="/hr/reports">
+                        <i class="fas fa-file-alt me-2"></i>Reports
+                    </a>
+                    <hr class="text-white">
+                    <a class="nav-link text-white" href="/">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="container-fluid p-4">
+                    <!-- Page Header -->
+                    <div class="page-header mb-4">
+                        <h1><i class="fas fa-plus-circle me-2"></i>Post New Job</h1>
+                        <p class="text-muted">Upload job description PDF and create new job posting</p>
+                    </div>
+
+                    <!-- Job Posting Form -->
+                    <div class="form-section">
+                        <h3 class="mb-4"><i class="fas fa-edit me-2"></i>Job Details</h3>
+
+                        <form id="jobPostingForm" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <!-- Job Title -->
+                                    <div class="mb-3">
+                                        <label for="jobTitle" class="form-label">Job Title *</label>
+                                        <input type="text" class="form-control" id="jobTitle" name="jobTitle"
+                                               placeholder="e.g. Senior Software Engineer" required>
+                                    </div>
+
+                                    <!-- User ID (Hidden field) -->
+                                    <input type="hidden" id="userId" name="userId" value="1">
+
+                                    <!-- File Upload Area -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Job Description PDF *</label>
+                                        <div class="upload-area" id="uploadArea">
+                                            <div class="upload-content">
+                                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                                <h5>Drag & Drop your job description PDF here</h5>
+                                                <p class="text-muted">or click to browse files</p>
+                                                <input type="file" class="d-none" id="jobFile" name="file" accept=".pdf" required>
+                                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('jobFile').click()">
+                                                    <i class="fas fa-folder-open me-2"></i>Choose File
+                                                </button>
+                                            </div>
+                                            <div class="file-info mt-3 d-none" id="fileInfo">
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-file-pdf me-2"></i>
+                                                    <span id="fileName">No file selected</span>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="clearFile()">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                                            <i class="fas fa-paper-plane me-2"></i>Post Job
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                            <i class="fas fa-undo me-2"></i>Reset
+                                        </button>
+                                        <div class="loading-spinner ms-3">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Processing...</span>
+                                            </div>
+                                            <span class="ms-2">Processing PDF...</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <!-- Job Preview -->
+                                    <div class="job-preview">
+                                        <h5><i class="fas fa-eye me-2"></i>Preview</h5>
+                                        <hr>
+                                        <div class="preview-content">
+                                            <h6 id="previewTitle" class="text-muted">Enter job title...</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                <span id="previewDate">Today</span>
+                                            </small>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-file-pdf me-1"></i>
+                                                    <span id="previewFile">No file selected</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Guidelines -->
+                                    <div class="mt-3">
+                                        <h6><i class="fas fa-lightbulb me-2"></i>Guidelines</h6>
+                                        <ul class="small text-muted">
+                                            <li>Upload a detailed job description PDF</li>
+                                            <li>Include requirements, responsibilities, and qualifications</li>
+                                            <li>AI will extract and process the content automatically</li>
+                                            <li>Ensure the PDF is readable and well-formatted</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Success Message -->
+                        <div class="success-message" id="successMessage">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Success!</strong> Job posted successfully.
+                            <div class="mt-2">
+                                <a href="#" id="viewJobLink" class="btn btn-sm btn-success">
+                                    <i class="fas fa-eye me-1"></i>View Job
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-success ms-2" onclick="postAnotherJob()">
+                                    <i class="fas fa-plus me-1"></i>Post Another Job
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div class="error-message" id="errorMessage">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Error!</strong> <span id="errorText">Something went wrong.</span>
+                        </div>
+                    </div>
+
+                    <!-- Current Jobs Section -->
+                    <div class="form-section">
+                        <h3 class="mb-4"><i class="fas fa-list me-2"></i>Current Job Postings</h3>
+                        <div id="currentJobs">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p class="mt-2">Loading current jobs...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set today's date in preview
+        document.getElementById('previewDate').textContent = new Date().toLocaleDateString();
+
+        // Job title preview update
+        document.getElementById('jobTitle').addEventListener('input', function() {
+            const title = this.value.trim();
+            document.getElementById('previewTitle').textContent = title || 'Enter job title...';
+        });
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('jobFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileInfo(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                updateFileInfo(this.files[0]);
+            }
+        });
+
+        function updateFileInfo(file) {
+            fileName.textContent = file.name;
+            fileInfo.classList.remove('d-none');
+            document.getElementById('previewFile').textContent = file.name;
+        }
+
+        function clearFile() {
+            fileInput.value = '';
+            fileInfo.classList.add('d-none');
+            document.getElementById('previewFile').textContent = 'No file selected';
+        }
+
+        // Form submission
+        document.getElementById('jobPostingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingSpinner = document.querySelector('.loading-spinner');
+
+            // Show loading state
+            submitBtn.disabled = true;
+            loadingSpinner.style.display = 'inline-flex';
+            hideMessages();
+
+            fetch('/api/upload/job-requirement', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess(data);
+                    loadCurrentJobs(); // Refresh job list
+                } else {
+                    showError(data.error || 'Failed to post job');
+                }
+            })
+            .catch(error => {
+                showError('Network error: ' + error.message);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                loadingSpinner.style.display = 'none';
+            });
+        });
+
+        function showSuccess(data) {
+            const successMsg = document.getElementById('successMessage');
+            const viewJobLink = document.getElementById('viewJobLink');
+            viewJobLink.href = '/job-details/' + data.jobRequirementId;
+            successMsg.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = message;
+            errorMsg.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('jobPostingForm').reset();
+            clearFile();
+            document.getElementById('previewTitle').textContent = 'Enter job title...';
+            hideMessages();
+        }
+
+        function postAnotherJob() {
+            resetForm();
+        }
+
+        // Load current jobs
+        function loadCurrentJobs() {
+            fetch('/api/jobs/list')
+                .then(response => response.json())
+                .then(jobs => {
+                    const container = document.getElementById('currentJobs');
+                    if (jobs.length === 0) {
+                        container.innerHTML = '<div class="text-center text-muted"><i class="fas fa-briefcase fa-2x"></i><p class="mt-2">No jobs posted yet</p></div>';
+                        return;
+                    }
+
+                    container.innerHTML = jobs.map(job => `
+                        <div class="card mb-3" id="job-${job.jobRequirementId}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <h5 class="card-title mb-0 me-2">${job.jobTitle}</h5>
+                                            <span class="badge ${job.published !== false ? 'bg-success' : 'bg-warning'} ms-2">
+                                                <i class="fas ${job.published !== false ? 'fa-eye' : 'fa-eye-slash'} me-1"></i>
+                                                ${job.published !== false ? 'Published' : 'Draft'}
+                                            </span>
+                                        </div>
+                                        <p class="card-text text-muted mb-2">${job.description.substring(0, 150)}...</p>
+                                        <div class="d-flex flex-wrap gap-2 text-muted small">
+                                            <span>
+                                                <i class="fas fa-calendar me-1"></i>
+                                                Posted: ${new Date(job.createdAt).toLocaleDateString()}
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-user me-1"></i>
+                                                Applications: ${job.applicationCount || 0}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column gap-2 ms-3">
+                                        <!-- Action Buttons -->
+                                        <div class="btn-group-vertical" role="group">
+                                            <a href="/job-details/${job.jobRequirementId}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="editJob(${job.jobRequirementId})">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </button>
+                                        </div>
+                                        <div class="btn-group-vertical" role="group">
+                                            <button type="button" class="btn ${job.published !== false ? 'btn-outline-warning' : 'btn-outline-success'} btn-sm"
+                                                    onclick="togglePublishStatus(${job.jobRequirementId}, ${job.published !== false})">
+                                                <i class="fas ${job.published !== false ? 'fa-eye-slash' : 'fa-eye'} me-1"></i>
+                                                ${job.published !== false ? 'Unpublish' : 'Publish'}
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDeleteJob(${job.jobRequirementId}, '${job.jobTitle.replace(/'/g, "\\'")}')">
+                                                <i class="fas fa-trash me-1"></i>Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    document.getElementById('currentJobs').innerHTML =
+                        '<div class="alert alert-danger">Error loading jobs: ' + error.message + '</div>';
+                });
+        }
+
+        // Toggle publish/unpublish status
+        function togglePublishStatus(jobId, isCurrentlyPublished) {
+            const action = isCurrentlyPublished ? 'unpublish' : 'publish';
+
+            if (!confirm(`Are you sure you want to ${action} this job?`)) {
+                return;
+            }
+
+            fetch(`/api/jobs/${jobId}/${action}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`Job ${action}ed successfully`, 'success');
+                    loadCurrentJobs(); // Refresh the list
+                } else {
+                    showToast(data.message || `Failed to ${action} job`, 'error');
+                }
+            })
+            .catch(error => {
+                showToast(`Network error: ${error.message}`, 'error');
+            });
+        }
+
+        // Confirm and delete job
+        function confirmDeleteJob(jobId, jobTitle) {
+            // Create a more detailed confirmation modal
+            const confirmed = confirm(
+                `⚠️ WARNING: You are about to permanently delete the job "${jobTitle}".\n\n` +
+                `This action will:\n` +
+                `• Remove the job posting permanently\n` +
+                `• Delete all associated applications\n` +
+                `• Cannot be undone\n\n` +
+                `Are you sure you want to proceed?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            deleteJob(jobId);
+        }
+
+        // Delete job
+        function deleteJob(jobId) {
+            fetch(`/api/jobs/${jobId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Job deleted successfully', 'success');
+                    // Animate removal
+                    const jobElement = document.getElementById(`job-${jobId}`);
+                    if (jobElement) {
+                        jobElement.style.transition = 'opacity 0.3s ease';
+                        jobElement.style.opacity = '0';
+                        setTimeout(() => {
+                            jobElement.remove();
+                        }, 300);
+                    }
+                    // Also refresh the list to be sure
+                    setTimeout(() => loadCurrentJobs(), 500);
+                } else {
+                    showToast(data.message || 'Failed to delete job', 'error');
+                }
+            })
+            .catch(error => {
+                showToast(`Network error: ${error.message}`, 'error');
+            });
+        }
+
+        // Edit job (placeholder for future implementation)
+        function editJob(jobId) {
+            showToast('Edit functionality coming soon!', 'info');
+            // TODO: Implement edit functionality
+            // This could open a modal or redirect to edit page
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            // Remove existing toasts
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            // Create toast
+            const toast = document.createElement('div');
+            toast.className = `toast-notification alert alert-${getAlertClass(type)} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+
+            toast.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas ${getToastIcon(type)} me-2"></i>
+                    <span>${message}</span>
+                    <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast && toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+        function getAlertClass(type) {
+            const classes = {
+                'success': 'success',
+                'error': 'danger',
+                'warning': 'warning',
+                'info': 'info'
+            };
+            return classes[type] || 'info';
+        }
+
+        function getToastIcon(type) {
+            const icons = {
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-triangle',
+                'warning': 'fa-exclamation-circle',
+                'info': 'fa-info-circle'
+            };
+            return icons[type] || 'fa-info-circle';
+        }
+
+        // Load jobs on page load
+        loadCurrentJobs();
+    </script>
+</body>
+</html>
