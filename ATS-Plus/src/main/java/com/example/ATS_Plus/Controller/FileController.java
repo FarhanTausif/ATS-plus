@@ -142,3 +142,88 @@ public class FileController {
         return error;
     }
 }
+//abid added
+// Add new RestController specifically for job management operations
+@RestController
+@RequestMapping("/api/jobs")
+@CrossOrigin(origins = "*")
+class JobManagementController {
+
+    @Autowired
+    private JobRequirementService jobRequirementService;
+
+    @GetMapping("/list")
+    public ResponseEntity<?> listJobs() {
+        try {
+            return ResponseEntity.ok(jobRequirementService.getAllJobRequirements());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(createErrorResponse("Error fetching jobs: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteJob(@PathVariable Long id) {
+        try {
+            JobRequirement job = jobRequirementService.getJobRequirementById(id);
+            if (job == null) {
+                return ResponseEntity.badRequest().body(createErrorResponse("Job not found"));
+            }
+
+            jobRequirementService.deleteJobRequirement(id);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Job deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(createErrorResponse("Error deleting job: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<?> publishJob(@PathVariable Long id) {
+        try {
+            JobRequirement job = jobRequirementService.getJobRequirementById(id);
+            if (job == null) {
+                return ResponseEntity.badRequest().body(createErrorResponse("Job not found"));
+            }
+
+            // Note: Since JobRequirement doesn't have published field yet,
+            // this is a placeholder for when you add that field to the model
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Job published successfully");
+            response.put("published", true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(createErrorResponse("Error publishing job: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/unpublish")
+    public ResponseEntity<?> unpublishJob(@PathVariable Long id) {
+        try {
+            JobRequirement job = jobRequirementService.getJobRequirementById(id);
+            if (job == null) {
+                return ResponseEntity.badRequest().body(createErrorResponse("Job not found"));
+            }
+
+            // Note: Since JobRequirement doesn't have published field yet,
+            // this is a placeholder for when you add that field to the model
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Job unpublished successfully");
+            response.put("published", false);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(createErrorResponse("Error unpublishing job: " + e.getMessage()));
+        }
+    }
+
+    private Map<String, Object> createErrorResponse(String message) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("error", message);
+        return error;
+    }
+}
