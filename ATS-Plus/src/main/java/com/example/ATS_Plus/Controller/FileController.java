@@ -7,6 +7,7 @@ import com.example.ATS_Plus.Model.User;
 import com.example.ATS_Plus.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.ATS_Plus.Service.CvContentService;
@@ -69,6 +70,7 @@ public class FileController {
     }
 
     @PostMapping("/job-requirement")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<?> uploadJobRequirement(@RequestParam("file") MultipartFile file,
                                                   @RequestParam("jobTitle") String jobTitle,
                                                   @RequestParam(value = "userId", defaultValue = "1") Long userId) {
@@ -118,6 +120,7 @@ public class FileController {
     }
 
     @GetMapping("/cv/list")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<?> listCvFiles() {
         try {
             return ResponseEntity.ok(cvFileService.getAllCvFiles());

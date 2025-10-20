@@ -8,6 +8,7 @@ import com.example.ATS_Plus.Service.JobRequirementService;
 import com.example.ATS_Plus.Service.LocalLlamaCVScoringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class CvScoreController {
     private JobRequirementService jobRequirementService;
 
     @PostMapping("/scoreCv")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<?> scoreCv(@RequestBody Map<String, String> request) {
         String cvFileIdStr = request.get("cvFileId");
         String jobRequirementIdStr = request.get("jobRequirementId");
@@ -106,6 +108,7 @@ public class CvScoreController {
     }
 
     @GetMapping("/status")
+    @PreAuthorize("hasRole('HR')")
     public ResponseEntity<?> checkStatus() {
         Map<String, Object> status = new HashMap<>();
         status.put("llamaAvailable", localLlamaCVScoringService.isLlamaModelAvailable());
